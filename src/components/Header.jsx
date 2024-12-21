@@ -6,32 +6,29 @@ import { FaTwitter } from 'react-icons/fa6'
 import { FaLinkedin } from 'react-icons/fa'
 import { FaGithub } from 'react-icons/fa'
 import { IoMdArrowDropdown } from 'react-icons/io'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { FaHeart } from 'react-icons/fa6'
 import { FaCartShopping } from 'react-icons/fa6'
 import { FaPhoneAlt } from 'react-icons/fa'
 import { IoIosArrowDown } from 'react-icons/io'
+import { useSelector } from 'react-redux'
 
 const Header = () => {
   const { pathname } = useLocation()
+  const navigate = useNavigate()
 
+  const { categories } = useSelector((state) => state.home)
+  const { userInfo } = useSelector((state) => state.auth)
   const [showShidebar, setShowShidebar] = useState(true)
   const [categoryShow, setCategoryShow] = useState(true)
-  const user = true
   const wishlist_count = 3
-  const categorys = [
-    'Mobiles',
-    'Laptops',
-    'Speakers',
-    'Top wear',
-    'Footwear',
-    'Watches',
-    'Home Decor',
-    'Smart Watches',
-  ]
 
   const [searchValue, setSearchValue] = useState('')
   const [category, setCategory] = useState('')
+
+  const search = () => {
+    navigate(`/products/search?category=${category}&&value=${searchValue}`)
+  }
 
   return (
     <div className="w-full bg-white">
@@ -81,16 +78,15 @@ const Header = () => {
                   </ul>
                 </div>
 
-                {user ? (
+                {userInfo ? (
                   <Link
                     className="flex cursor-pointer justify-center items-center gap-2 text-sm text-black"
                     to="/dashboard"
                   >
                     <span>
-                      {' '}
                       <FaUser />{' '}
                     </span>
-                    <span>Kazi Ariyan </span>
+                    <span>{userInfo.name}</span>
                   </Link>
                 ) : (
                   <Link
@@ -135,6 +131,7 @@ const Header = () => {
                 <ul className="flex justify-start items-start gap-8 text-sm font-bold uppercase md-lg:hidden">
                   <li>
                     <Link
+                      to="/"
                       className={`p-2 block ${
                         pathname === '/' ? 'text-[#059473]' : 'text-slate-600'
                       } `}
@@ -145,6 +142,7 @@ const Header = () => {
 
                   <li>
                     <Link
+                      to="/shop"
                       className={`p-2 block ${
                         pathname === '/shop'
                           ? 'text-[#059473]'
@@ -244,16 +242,15 @@ const Header = () => {
                   <li>English</li>
                 </ul>
               </div>
-              {user ? (
+              {userInfo ? (
                 <Link
                   className="flex cursor-pointer justify-center items-center gap-2 text-sm text-black"
                   to="/dashboard"
                 >
                   <span>
-                    {' '}
                     <FaUser />{' '}
                   </span>
-                  <span>Kazi Ariyan </span>
+                  <span>{userInfo.name}</span>
                 </Link>
               ) : (
                 <Link
@@ -387,13 +384,18 @@ const Header = () => {
                 } overflow-hidden transition-all md-lg:relative duration-500 absolute z-[99999] bg-[#dbf3ed] w-full border-x`}
               >
                 <ul className="py-2 text-slate-600 font-medium">
-                  {categorys.map((c, i) => {
+                  {categories.map((c, i) => {
                     return (
                       <li
                         key={i}
                         className="flex justify-start items-center gap-2 px-[24px] py-[6px]"
                       >
-                        <Link className="text-sm block">{c}</Link>
+                        <Link
+                          to={`/products?category=${c.name}`}
+                          className="text-sm block"
+                        >
+                          {c.name}
+                        </Link>
                       </li>
                     )
                   })}
@@ -414,8 +416,8 @@ const Header = () => {
                       id=""
                     >
                       <option value="">Select Category</option>
-                      {categorys.map((c, i) => (
-                        <option value={c}>{c}</option>
+                      {categories.map((c, i) => (
+                        <option value={c.name}>{c.name}</option>
                       ))}
                     </select>
                   </div>
@@ -427,7 +429,10 @@ const Header = () => {
                     id=""
                     placeholder="What do you need"
                   />
-                  <button className="bg-[#059473] right-0 absolute px-8 h-full font-semibold uppercase text-white">
+                  <button
+                    onClick={search}
+                    className="bg-[#059473] right-0 absolute px-8 h-full font-semibold uppercase text-white"
+                  >
                     Search
                   </button>
                 </div>

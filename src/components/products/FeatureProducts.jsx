@@ -1,9 +1,10 @@
 import React from 'react'
 import { FaEye, FaRegHeart } from 'react-icons/fa'
 import { RiShoppingCartLine } from 'react-icons/ri'
+import { Link } from 'react-router-dom'
 import Rating from '../Rating'
 
-const FeatureProducts = () => {
+const FeatureProducts = ({ products }) => {
   return (
     <div className="w-[85%] flex flex-wrap mx-auto">
       <div className="w-full">
@@ -14,18 +15,18 @@ const FeatureProducts = () => {
       </div>
 
       <div className="w-full grid grid-cols-4 md-lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-6">
-        {[1, 2, 3, 4, 5, 6].map((item, index) => (
+        {products.map((item, index) => (
           <div
             key={index}
             className="border group transition-all duration-500 hover:shadow-md hover:-mt-3"
           >
             <div className="relative overflow-hidden">
               <div className="flex justify-center items-center absolute text-white w-[38px] h-[38px] rounded-full bg-red-500 font-semibold text-xs left-2 top-2">
-                8%
+                {item.discount}%
               </div>
               <img
                 className="sm:w-full w-full h-[240px]"
-                src={`http://localhost:3000/images/products/${index + 1}.webp`}
+                src={item.images[0]}
                 alt=""
               />
 
@@ -33,9 +34,12 @@ const FeatureProducts = () => {
                 <li className="w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-[#059473] hover:text-white hover:rotate-[720deg] transition-all">
                   <FaRegHeart />
                 </li>
-                <li className="w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-[#059473] hover:text-white hover:rotate-[720deg] transition-all">
+                <Link
+                  to="/product/detail/new"
+                  className="w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-[#059473] hover:text-white hover:rotate-[720deg] transition-all"
+                >
                   <FaEye />
-                </li>
+                </Link>
                 <li className="w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-[#059473] hover:text-white hover:rotate-[720deg] transition-all">
                   <RiShoppingCartLine />
                 </li>
@@ -43,11 +47,11 @@ const FeatureProducts = () => {
             </div>
 
             <div className="py-3 text-slate-600 px-2">
-              <h2 className="font-bold">Product Name </h2>
+              <h2 className="font-bold">{item.name}</h2>
               <div className="flex justify-start items-center gap-3">
-                <span className="text-md font-semibold">$656</span>
+                <span className="text-md font-semibold">{item.price}</span>
                 <div className="flex">
-                  <Rating ratings={4.5} />
+                  <Rating ratings={item.rating} />
                 </div>
               </div>
             </div>

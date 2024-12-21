@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { IoIosArrowForward } from 'react-icons/io'
 import { Range } from 'react-range'
 import { AiFillStar } from 'react-icons/ai'
@@ -16,18 +16,20 @@ import {
   price_range_product,
   query_products,
 } from '../store/reducers/homeReducer'
+const SearchProducts = () => {
+  let [searchParams, setSearchParams] = useSearchParams()
+  const category = searchParams.get('category')
+  const searchValue = searchParams.get('value')
 
-const Shops = () => {
   const dispatch = useDispatch()
   const {
     products,
-    categories,
+    categorys,
     price_range,
     latest_product,
     totalProduct,
     parPage,
   } = useSelector((state) => state.home)
-
   useEffect(() => {
     dispatch(price_range_product())
   }, [])
@@ -36,9 +38,7 @@ const Shops = () => {
       values: [price_range.low, price_range.high],
     })
   }, [price_range])
-
   const [filter, setFilter] = useState(true)
-
   const [state, setState] = useState({
     values: [price_range.low, price_range.high],
   })
@@ -46,26 +46,18 @@ const Shops = () => {
   const [styles, setStyles] = useState('grid')
 
   const [pageNumber, setPageNumber] = useState(1)
-
   const [sortPrice, setSortPrice] = useState('')
-  const [category, setCategory] = useState('')
-  const queryCategory = (e, value) => {
-    if (e.target.checked) {
-      setCategory(value)
-    } else {
-      setCategory('')
-    }
-  }
 
   useEffect(() => {
     dispatch(
       query_products({
-        low: state.values[0],
-        high: state.values[1],
+        low: state.values[0] || '',
+        high: state.values[1] || '',
         category,
         rating,
         sortPrice,
         pageNumber,
+        searchValue,
       })
     )
   }, [
@@ -74,9 +66,9 @@ const Shops = () => {
     category,
     rating,
     sortPrice,
+    searchValue,
     pageNumber,
   ])
-
   const resetRating = () => {
     setRating('')
     dispatch(
@@ -98,19 +90,18 @@ const Shops = () => {
         <div className="absolute left-0 top-0 w-full h-full bg-[#2422228a]">
           <div className="w-[85%] md:w-[80%] sm:w-[90%] lg:w-[90%] h-full mx-auto">
             <div className="flex flex-col justify-center gap-1 items-center h-full w-full text-white">
-              <h2 className="text-3xl font-bold">Shop Page </h2>
+              <h2 className="text-3xl font-bold">Category Page </h2>
               <div className="flex justify-center items-center gap-2 text-2xl w-full">
                 <Link to="/">Home</Link>
                 <span className="pt-1">
                   <IoIosArrowForward />
                 </span>
-                <span>Shop </span>
+                <span>Category </span>
               </div>
             </div>
           </div>
         </div>
       </section>
-
       <section className="py-16">
         <div className="w-[85%] md:w-[80%] sm:w-[90%] lg:w-[90%] h-full mx-auto">
           <div className={` md:block hidden ${!filter ? 'mb-6' : 'mb-0'} `}>
@@ -121,7 +112,6 @@ const Shops = () => {
               Filter Product
             </button>
           </div>
-
           <div className="w-full flex flex-wrap">
             <div
               className={`w-3/12 md-lg:w-4/12 md:w-full pr-8 ${
@@ -130,31 +120,6 @@ const Shops = () => {
                   : 'md:h-auto md:overflow-auto md:mb-0'
               } `}
             >
-              <h2 className="text-3xl font-bold mb-3 text-slate-600">
-                Category{' '}
-              </h2>
-              <div className="py-2">
-                {categories.map((c, i) => (
-                  <div
-                    key={i}
-                    className="flex justify-start items-center gap-2 py-1"
-                  >
-                    <input
-                      checked={category === c.name ? true : false}
-                      onChange={(e) => queryCategory(e, c.name)}
-                      type="checkbox"
-                      id={c.name}
-                    />
-                    <label
-                      className="text-slate-600 block cursor-pointer"
-                      htmlFor={c.name}
-                    >
-                      {c.name}
-                    </label>
-                  </div>
-                ))}
-              </div>
-
               <div className="py-2 flex flex-col gap-5">
                 <h2 className="text-3xl font-bold mb-3 text-slate-600">
                   Price
@@ -188,7 +153,6 @@ const Shops = () => {
                   </span>
                 </div>
               </div>
-
               <div className="py-3 flex flex-col gap-4">
                 <h2 className="text-3xl font-bold mb-3 text-slate-600">
                   Rating{' '}
@@ -214,7 +178,6 @@ const Shops = () => {
                       <AiFillStar />{' '}
                     </span>
                   </div>
-
                   <div
                     onClick={() => setRating(4)}
                     className="text-orange-500 flex justify-start items-start gap-2 text-xl cursor-pointer"
@@ -235,7 +198,6 @@ const Shops = () => {
                       <CiStar />{' '}
                     </span>
                   </div>
-
                   <div
                     onClick={() => setRating(3)}
                     className="text-orange-500 flex justify-start items-start gap-2 text-xl cursor-pointer"
@@ -256,7 +218,6 @@ const Shops = () => {
                       <CiStar />{' '}
                     </span>
                   </div>
-
                   <div
                     onClick={() => setRating(2)}
                     className="text-orange-500 flex justify-start items-start gap-2 text-xl cursor-pointer"
@@ -277,7 +238,6 @@ const Shops = () => {
                       <CiStar />{' '}
                     </span>
                   </div>
-
                   <div
                     onClick={() => setRating(1)}
                     className="text-orange-500 flex justify-start items-start gap-2 text-xl cursor-pointer"
@@ -298,7 +258,6 @@ const Shops = () => {
                       <CiStar />{' '}
                     </span>
                   </div>
-
                   <div
                     onClick={resetRating}
                     className="text-orange-500 flex justify-start items-start gap-2 text-xl cursor-pointer"
@@ -326,7 +285,6 @@ const Shops = () => {
                 <Products title="Latest Product" products={latest_product} />
               </div>
             </div>
-
             <div className="w-9/12 md-lg:w-8/12 md:w-full">
               <div className="pl-8 md:pl-0">
                 <div className="py-4 bg-white mb-10 px-3 rounded-md flex justify-between items-start border">
@@ -365,11 +323,9 @@ const Shops = () => {
                     </div>
                   </div>
                 </div>
-
                 <div className="pb-8">
                   <ShopProducts products={products} styles={styles} />
                 </div>
-
                 <div>
                   {totalProduct > parPage && (
                     <Pagination
@@ -386,10 +342,8 @@ const Shops = () => {
           </div>
         </div>
       </section>
-
       <Footer />
     </div>
   )
 }
-
-export default Shops
+export default SearchProducts
