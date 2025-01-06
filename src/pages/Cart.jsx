@@ -25,32 +25,34 @@ const Cart = () => {
     outofstock_products,
   } = useSelector((state) => state.cart)
 
-  console.log(cart_products, userInfo)
+  console.log(userInfo)
 
   const navigate = useNavigate()
 
   const redirect = () => {
     navigate('/shipping', {
       state: {
-        products: [],
-        price: 500,
-        shipping_fee: 40,
-        items: 2,
+        products: cart_products,
+        price: price,
+        shipping_fee: shipping_fee,
+        items: buy_product_item,
       },
     })
   }
 
-  const inc = (quantity, stock, card_id) => {
+  const inc = (quantity, stock, cart_id) => {
     const temp = quantity + 1
     if (temp <= stock) {
-      dispatch(quantity_inc(card_id))
+      dispatch(quantity_inc(cart_id))
     }
   }
 
-  const dec = (quantity, card_id) => {
+  const dec = (quantity, cart_id) => {
     const temp = quantity - 1
     if (temp !== 0) {
-      dispatch(quantity_dec(card_id))
+      dispatch(quantity_dec(cart_id))
+    } else {
+      dispatch(delete_cart_product(cart_id))
     }
   }
 
@@ -61,6 +63,10 @@ const Cart = () => {
       dispatch(get_cart_products(userInfo.id))
     }
   }, [successMessage, dispatch, userInfo.id])
+
+  useEffect(() => {
+    dispatch(get_cart_products(userInfo.id))
+  }, [dispatch, userInfo.id])
 
   return (
     <div>
@@ -142,9 +148,7 @@ const Cart = () => {
                               <div className="flex gap-2 flex-col">
                                 <div className="flex bg-slate-200 h-[30px] justify-center items-center text-xl">
                                   <div
-                                    onClick={() =>
-                                      dispatch(dec(pt.quantity, pt._id))
-                                    }
+                                    onClick={() => dec(pt.quantity, pt._id)}
                                     className="px-3 cursor-pointer"
                                   >
                                     -
@@ -298,7 +302,7 @@ const Cart = () => {
             </div>
           ) : (
             <div>
-              <Link className="px-4 py-1 bg-indigo-500 text-white" to="/shops">
+              <Link className="px-4 py-1 bg-indigo-500 text-white" to="/shop">
                 {' '}
                 Shop Now
               </Link>

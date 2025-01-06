@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { FaFacebookF } from 'react-icons/fa6'
 import { FaGoogle } from 'react-icons/fa6'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { customer_login, messageClear } from '../store/reducers/authReducer'
 import toast from 'react-hot-toast'
 
 const Login = () => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const { errorMessage, successMessage } = useSelector((state) => state.auth)
 
@@ -27,6 +28,7 @@ const Login = () => {
     if (successMessage) {
       toast.success(successMessage)
       dispatch(messageClear())
+      navigate('/')
     }
     if (errorMessage) {
       toast.error(errorMessage)

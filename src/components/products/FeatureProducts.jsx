@@ -4,7 +4,7 @@ import { RiShoppingCartLine } from 'react-icons/ri'
 import { Link, useNavigate } from 'react-router-dom'
 import Rating from '../Rating'
 import { useDispatch, useSelector } from 'react-redux'
-import { add_to_cart } from '../../store/reducers/cartReducer'
+import { add_to_cart, add_to_wishlist } from '../../store/reducers/cartReducer'
 import toast from 'react-hot-toast'
 import { messageClear } from '../../store/reducers/authReducer'
 
@@ -26,6 +26,21 @@ const FeatureProducts = ({ products }) => {
     } else {
       navigate('/login')
     }
+  }
+
+  const add_wishlist = (pro) => {
+    dispatch(
+      add_to_wishlist({
+        userId: userInfo.id,
+        productId: pro._id,
+        name: pro.name,
+        price: pro.price,
+        image: pro.images[0],
+        discount: pro.discount,
+        rating: pro.rating,
+        slug: pro.slug,
+      })
+    )
   }
 
   useEffect(() => {
@@ -65,11 +80,14 @@ const FeatureProducts = ({ products }) => {
               />
 
               <ul className="flex transition-all duration-700 -bottom-10 justify-center items-center gap-2 absolute w-full group-hover:bottom-3">
-                <li className="w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-[#059473] hover:text-white hover:rotate-[720deg] transition-all">
+                <li
+                  onClick={add_wishlist(item)}
+                  className="w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-[#059473] hover:text-white hover:rotate-[720deg] transition-all"
+                >
                   <FaRegHeart />
                 </li>
                 <Link
-                  to="/product/detail/new"
+                  to={`/product/detail/${item.slug}`}
                   className="w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-[#059473] hover:text-white hover:rotate-[720deg] transition-all"
                 >
                   <FaEye />

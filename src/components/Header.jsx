@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { MdEmail } from 'react-icons/md'
 import { IoMdPhonePortrait } from 'react-icons/io'
 import { FaFacebookF, FaList, FaLock, FaUser } from 'react-icons/fa'
@@ -11,13 +11,32 @@ import { FaHeart } from 'react-icons/fa6'
 import { FaCartShopping } from 'react-icons/fa6'
 import { FaPhoneAlt } from 'react-icons/fa'
 import { IoIosArrowDown } from 'react-icons/io'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  get_cart_products,
+  get_wishlist_products,
+} from '../store/reducers/cartReducer'
 
 const Header = () => {
-  const { pathname } = useLocation()
+  const dispatch = useDispatch()
   const navigate = useNavigate()
+  const { categories } = useSelector((state) => state.home)
+  const { userInfo } = useSelector((state) => state.auth)
+  const { cart_product_count, wishlist_count } = useSelector(
+    (state) => state.cart
+  )
 
-  const { cart_product_count } = useSelector((state) => state.cart)
+  const { pathname } = useLocation()
+
+  const [showShidebar, setShowShidebar] = useState(true)
+  const [categoryShow, setCategoryShow] = useState(true)
+
+  const [searchValue, setSearchValue] = useState('')
+  const [category, setCategory] = useState('')
+
+  const search = () => {
+    navigate(`/products/search?category=${category}&&value=${searchValue}`)
+  }
 
   const redirect_cart_page = () => {
     if (userInfo) {
@@ -27,18 +46,12 @@ const Header = () => {
     }
   }
 
-  const { categories } = useSelector((state) => state.home)
-  const { userInfo } = useSelector((state) => state.auth)
-  const [showShidebar, setShowShidebar] = useState(true)
-  const [categoryShow, setCategoryShow] = useState(true)
-  const wishlist_count = 3
-
-  const [searchValue, setSearchValue] = useState('')
-  const [category, setCategory] = useState('')
-
-  const search = () => {
-    navigate(`/products/search?category=${category}&&value=${searchValue}`)
-  }
+  useEffect(() => {
+    if (userInfo) {
+      dispatch(get_cart_products(userInfo.id))
+      dispatch(get_wishlist_products(userInfo.id))
+    }
+  }, [userInfo])
 
   return (
     <div className="w-full bg-white">
@@ -94,14 +107,15 @@ const Header = () => {
                     to="/dashboard"
                   >
                     <span>
+                      {' '}
                       <FaUser />{' '}
                     </span>
-                    <span>{userInfo.name}</span>
+                    <span> {userInfo.name} </span>
                   </Link>
                 ) : (
                   <Link
-                    className="flex cursor-pointer justify-center items-center gap-2 text-sm text-black"
                     to="/login"
+                    className="flex cursor-pointer justify-center items-center gap-2 text-sm text-black"
                   >
                     <span>
                       {' '}
@@ -141,7 +155,6 @@ const Header = () => {
                 <ul className="flex justify-start items-start gap-8 text-sm font-bold uppercase md-lg:hidden">
                   <li>
                     <Link
-                      to="/"
                       className={`p-2 block ${
                         pathname === '/' ? 'text-[#059473]' : 'text-slate-600'
                       } `}
@@ -152,9 +165,9 @@ const Header = () => {
 
                   <li>
                     <Link
-                      to="/shop"
+                      to="/shops"
                       className={`p-2 block ${
-                        pathname === '/shop'
+                        pathname === '/shops'
                           ? 'text-[#059473]'
                           : 'text-slate-600'
                       } `}
@@ -199,13 +212,21 @@ const Header = () => {
 
                 <div className="flex md-lg:hidden justify-center items-center gap-5">
                   <div className="flex justify-center gap-5">
-                    <div className="relative flex justify-center items-center cursor-pointer w-[35px] h-[35px] rounded-full bg-[#e2e2e2]">
+                    <div
+                      onClick={() =>
+                        navigate(userInfo ? '/dashboard/my-wishlist' : '/login')
+                      }
+                      className="relative flex justify-center items-center cursor-pointer w-[35px] h-[35px] rounded-full bg-[#e2e2e2]"
+                    >
                       <span className="text-xl text-green-500">
                         <FaHeart />
                       </span>
-                      <div className="w-[20px] h-[20px] absolute bg-red-500 rounded-full text-white flex justify-center items-center -top-[3px] -right-[5px] ">
-                        {wishlist_count}
-                      </div>
+
+                      {wishlist_count !== 0 && (
+                        <div className="w-[20px] h-[20px] absolute bg-red-500 rounded-full text-white flex justify-center items-center -top-[3px] -right-[5px] ">
+                          {wishlist_count}
+                        </div>
+                      )}
                     </div>
 
                     <div
@@ -215,6 +236,7 @@ const Header = () => {
                       <span className="text-xl text-green-500">
                         <FaCartShopping />
                       </span>
+
                       {cart_product_count !== 0 && (
                         <div className="w-[20px] h-[20px] absolute bg-red-500 rounded-full text-white flex justify-center items-center -top-[3px] -right-[5px] ">
                           {cart_product_count}
@@ -263,6 +285,7 @@ const Header = () => {
                   to="/dashboard"
                 >
                   <span>
+                    {' '}
                     <FaUser />{' '}
                   </span>
                   <span>{userInfo.name}</span>
@@ -284,7 +307,6 @@ const Header = () => {
             <ul className="flex flex-col justify-start items-start text-sm font-bold uppercase">
               <li>
                 <Link
-                  to="/"
                   className={`py-2 block ${
                     pathname === '/' ? 'text-[#059473]' : 'text-slate-600'
                   } `}
@@ -295,9 +317,9 @@ const Header = () => {
 
               <li>
                 <Link
-                  to="/shop"
+                  to="/shops"
                   className={`py-2 block ${
-                    pathname === '/shop' ? 'text-[#059473]' : 'text-slate-600'
+                    pathname === '/shops' ? 'text-[#059473]' : 'text-slate-600'
                   } `}
                 >
                   Shop
@@ -405,6 +427,11 @@ const Header = () => {
                         key={i}
                         className="flex justify-start items-center gap-2 px-[24px] py-[6px]"
                       >
+                        <img
+                          src={c.image}
+                          className="w-[30px] h-[30px] rounded-full overflow-hidden"
+                          alt=""
+                        />
                         <Link
                           to={`/products?category=${c.name}`}
                           className="text-sm block"
@@ -432,7 +459,10 @@ const Header = () => {
                     >
                       <option value="">Select Category</option>
                       {categories.map((c, i) => (
-                        <option value={c.name}>{c.name}</option>
+                        <option key={i} value={c.name}>
+                          {' '}
+                          {c.name}{' '}
+                        </option>
                       ))}
                     </select>
                   </div>
