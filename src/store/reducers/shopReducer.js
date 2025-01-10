@@ -40,17 +40,33 @@ export const product_details = createAsyncThunk(
   }
 )
 
+export const product_relations = createAsyncThunk(
+  'product/product_relations',
+  async (query, { fulfillWithValue }) => {
+    try {
+      const { data } = await apii.get(
+        `/Item/query?category=${
+          query.category ? encodeURIComponent(query.category) : ''}`
+      )
+      return fulfillWithValue(data)
+    } catch (error) {
+      console.log(error.response)
+    }
+  }
+)
+
+
 export const shopReducer = createSlice({
   name: 'shop',
   initialState: {
     categories: [],
     products: [],
+    relatedProducts: [],
     productByCat: [],
     latest_product: [],
     topRated_product: [],
     discount_product: [],
     product: {},
-    relatedProducts: [],
     moreProduct: [],
     errorMessage: '',
     successMessage: '',
@@ -85,6 +101,10 @@ export const shopReducer = createSlice({
 
       .addCase(product_details.fulfilled, (state, { payload }) => {
         state.product = payload
+      })
+
+      .addCase(product_relations.fulfilled, (state, { payload }) => {
+        state.relatedProducts = payload.items
       })
   },
 })

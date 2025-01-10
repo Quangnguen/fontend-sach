@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom'
 import 'react-multi-carousel/lib/styles.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { get_products_by_category } from '../../store/reducers/homeReducer'
-import apii from '../../api/apii'
 import { formatCurrency, truncateText } from '../../utils/format'
 
 const FeatureProducts = ({ category }) => {

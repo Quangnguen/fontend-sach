@@ -3,18 +3,20 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { IoIosArrowForward } from 'react-icons/io'
-import Carousel from 'react-multi-carousel'
+// import Carousel from 'react-multi-carousel'
 import 'react-multi-carousel/lib/styles.css'
-import Rating from '../components/Rating'
 
 import { Pagination } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/pagination'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { useDispatch, useSelector } from 'react-redux'
-import { product_details } from '../store/reducers/shopReducer'
+import {
+  product_details,
+  product_relations,
+} from '../store/reducers/shopReducer'
 import toast from 'react-hot-toast'
-import { formatCurrency } from '../utils/format'
+import { formatCurrency, truncateText } from '../utils/format'
 import { addProduct } from '../store/reducers/cartReducer'
 import bannerImage from '../assets/images/banner/shop.png'
 
@@ -25,18 +27,9 @@ const Details = () => {
     dispatch(product_details(slug))
   }, [slug, dispatch])
 
-  const { product, relatedProducts, moreProducts } = useSelector(
-    (state) => state.shop
-  )
+  const { product, relatedProducts } = useSelector((state) => state.shop)
 
-  const { errorMessage, successMessage } = useSelector((state) => state.cart)
-
-  const navigate = useNavigate()
-
-  const images = [1, 2, 3, 4, 5, 6]
-  const [image, setImage] = useState('')
-  const discount = 10
-  const [state, setState] = useState('reviews')
+  // const [image, setImage] = useState('')
 
   const [quantity, setQuantity] = useState(1)
   const inc = () => {
@@ -52,27 +45,22 @@ const Details = () => {
     }
   }
 
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    dispatch(product_relations({ category: product.category }))
+  }, [product, dispatch])
+
   const buynow = () => {
-    let price = 0
-    if (product.discount !== 0) {
-      price =
-        product.price - Math.floor((product.price * product.discount) / 100)
-    } else {
-      price = product.price
+    const productObj = {
+      id: product.id,
+      image: product.imageFileName,
+      name: product.name,
+      price: product.price,
+      quantity,
     }
-    const obj = [
-      {
-        sellerId: product.sellerId,
-        shopName: product.shopName,
-        price: quantity * (price - Math.floor((price * 5) / 100)),
-        products: [
-          {
-            quantity,
-            productInfo: product,
-          },
-        ],
-      },
-    ]
+    dispatch(addProduct(productObj))
+    navigate('/shipping')
   }
 
   const cart = useSelector((state) => state.cart)
@@ -92,36 +80,36 @@ const Details = () => {
     dispatch(addProduct(product))
   }
 
-  const responsive = {
-    superLargeDesktop: {
-      breakpoint: { max: 4000, min: 3000 },
-      items: 5,
-    },
-    desktop: {
-      breakpoint: { max: 3000, min: 1024 },
-      items: 5,
-    },
-    tablet: {
-      breakpoint: { max: 1024, min: 464 },
-      items: 4,
-    },
-    mdtablet: {
-      breakpoint: { max: 991, min: 464 },
-      items: 4,
-    },
-    mobile: {
-      breakpoint: { max: 464, min: 0 },
-      items: 3,
-    },
-    smmobile: {
-      breakpoint: { max: 640, min: 0 },
-      items: 2,
-    },
-    xsmobile: {
-      breakpoint: { max: 440, min: 0 },
-      items: 1,
-    },
-  }
+  // const responsive = {
+  //   superLargeDesktop: {
+  //     breakpoint: { max: 4000, min: 3000 },
+  //     items: 5,
+  //   },
+  //   desktop: {
+  //     breakpoint: { max: 3000, min: 1024 },
+  //     items: 5,
+  //   },
+  //   tablet: {
+  //     breakpoint: { max: 1024, min: 464 },
+  //     items: 4,
+  //   },
+  //   mdtablet: {
+  //     breakpoint: { max: 991, min: 464 },
+  //     items: 4,
+  //   },
+  //   mobile: {
+  //     breakpoint: { max: 464, min: 0 },
+  //     items: 3,
+  //   },
+  //   smmobile: {
+  //     breakpoint: { max: 640, min: 0 },
+  //     items: 2,
+  //   },
+  //   xsmobile: {
+  //     breakpoint: { max: 440, min: 0 },
+  //     items: 1,
+  //   },
+  // }
 
   return (
     <div>
@@ -130,6 +118,7 @@ const Details = () => {
         className="h-[220px] mt-6 bg-cover bg-no-repeat relative bg-left"
         style={{ backgroundImage: `url(${bannerImage})` }} // Use the imported image
       >
+        import {(truncateText, formatCurrency)} from './../utils/format';
         <div className="absolute left-0 top-0 w-full h-full bg-[#2422228a]">
           <div className="w-[85%] md:w-[80%] sm:w-[90%] lg:w-[90%] h-full mx-auto">
             <div className="flex flex-col justify-center gap-1 items-center h-full w-full text-white">
@@ -175,7 +164,7 @@ const Details = () => {
                   alt=""
                 />
               </div>
-              <div className="py-3">
+              {/* <div className="py-3">
                 {product.images && (
                   <Carousel
                     autoPlay={true}
@@ -196,7 +185,7 @@ const Details = () => {
                     })}
                   </Carousel>
                 )}
-              </div>
+              </div> */}
             </div>
 
             <div className="flex flex-col gap-5">
@@ -259,7 +248,7 @@ const Details = () => {
                     }
                     className="px-8 py-3 h-[50px] cursor-pointer hover:shadow-lg hover:shadow-green-500/40 bg-[#059473] text-white"
                   >
-                    Add To Card
+                    Thêm vào giỏ hàng
                   </button>
                 </div>
                 {/* </> */}
@@ -283,7 +272,7 @@ const Details = () => {
                   onClick={buynow}
                   className="px-8 py-3 h-[50px] cursor-pointer hover:shadow-lg hover:shadow-green-500/40 bg-[#247462] text-white"
                 >
-                  Buy Now
+                  Mua ngay
                 </button>
                 {/* ) : (
                   ''
@@ -326,7 +315,7 @@ const Details = () => {
               modules={[Pagination]}
               className="mySwiper"
             >
-              {[1, 2, 3, 4, 5, 6].map((p, i) => {
+              {relatedProducts.map((p, i) => {
                 return (
                   <SwiperSlide key={i}>
                     <Link className="block">
@@ -334,29 +323,21 @@ const Details = () => {
                         <div className="w-full h-full">
                           <img
                             className="w-full h-full"
-                            src={`http://localhost:3000/images/products/${p}.webp`}
+                            src={`https://ahoang.onrender.com/api/ImageUpload/get/${p.imageFileName}`}
                             alt=""
                           />
-                          <div className="absolute h-full w-full top-0 left-0 bg-[#000] opacity-25 hover:opacity-50 transition-all duration-500"></div>
+                          <div className="absolute h-full w-full top-0 left-0 opacity-25 hover:bg-slate-500 transition-all duration-500"></div>
                         </div>
-                        {discount !== 0 && (
-                          <div className="flex justify-center items-center absolute text-white w-[38px] h-[38px] rounded-full bg-red-500 font-semibold text-xs left-2 top-2">
-                            {discount}%
-                          </div>
-                        )}
                       </div>
 
                       <div className="p-4 flex flex-col gap-1">
                         <h2 className="text-slate-600 text-lg font-bold">
-                          Product Name{' '}
+                          {truncateText(p.name, 20)}
                         </h2>
                         <div className="flex justify-start items-center gap-3">
                           <h2 className="text-lg font-bold text-slate-600">
-                            $434
+                            {formatCurrency(parseInt(p.price))}
                           </h2>
-                          <div className="flex">
-                            <Rating ratings={4.5} />
-                          </div>
                         </div>
                       </div>
                     </Link>

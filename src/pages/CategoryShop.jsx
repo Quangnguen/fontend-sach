@@ -1,18 +1,15 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import { Link, useSearchParams } from 'react-router-dom'
 import { IoIosArrowForward } from 'react-icons/io'
 import { Range } from 'react-range'
-import { AiFillStar } from 'react-icons/ai'
-import { CiStar } from 'react-icons/ci'
 import { BsFillGridFill } from 'react-icons/bs'
 import { FaThList } from 'react-icons/fa'
 import ShopProducts from '../components/products/ShopProducts'
 import Pagination from '../components/Pagination'
 import { useDispatch, useSelector } from 'react-redux'
 import { query_products } from '../store/reducers/shopReducer'
-import { encodeToURL } from '../utils/format'
 import bannerImage from '../assets/images/banner/shop.png'
 
 const CategoryShop = () => {
@@ -36,27 +33,25 @@ const CategoryShop = () => {
   const [state, setState] = useState({
     values: [price_range.low, price_range.high],
   })
-  const [rating, setRating] = useState('')
+  // const [rating, setRating] = useState('')
   const [styles, setStyles] = useState('grid')
 
   const [pageNumber, setPageNumber] = useState(1)
   const [sortPrice, setSortPrice] = useState('')
 
-  
-
-  const resetRating = () => {
-    setRating('')
-    dispatch(
-      query_products({
-        low: state.values[0],
-        high: state.values[1],
-        category: encodeToURL(category),
-        className: encodeToURL(className),
-        sortPrice,
-        pageNumber,
-      })
-    )
-  }
+  // const resetRating = () => {
+  //   setRating('')
+  //   dispatch(
+  //     query_products({
+  //       low: state.values[0],
+  //       high: state.values[1],
+  //       category: encodeToURL(category),
+  //       className: encodeToURL(className),
+  //       sortPrice,
+  //       pageNumber,
+  //     })
+  //   )
+  // }
 
   useEffect(() => {
     dispatch(
@@ -288,7 +283,7 @@ const CategoryShop = () => {
                       onChange={(e) => setSortPrice(e.target.value)}
                       className="p-1 border outline-0 text-slate-600 font-semibold"
                       name=""
-                      id="" 
+                      id=""
                     >
                       <option value="">Sắp xếp theo</option>
                       <option value="low-to-high">Giá tăng dần</option>
