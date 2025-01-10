@@ -3,8 +3,11 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { IoIosArrowForward } from 'react-icons/io'
+
+import { formatCurrency } from '../utils/format'
+import { messageClear, place_order } from './../store/reducers/orderReducer'
 import { useDispatch, useSelector } from 'react-redux'
-import { messageClear, place_order } from '../store/reducers/orderReducer'
+import { email } from '../utils/email'
 import toast from 'react-hot-toast'
 
 const Shipping = () => {
@@ -19,14 +22,37 @@ const Shipping = () => {
     area: '',
   })
 
-  const {
-    state: { products, price, shipping_fee, items },
-  } = useLocation()
-
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { userInfo } = useSelector((state) => state.auth)
-  const { orderId, successMessage } = useSelector((state) => state.order)
+
+  const { successMessage, errorMessage } = useSelector((state) => state.order)
+  const cart = useSelector((state) => state.cart)
+
+  const totalPrice = cart.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  )
+
+  useEffect(() => {
+    // Đảm bảo không gọi lại `setItem` quá nhiều lần
+    const cart = JSON.parse(localStorage.getItem('cart')) || []
+    // Thực hiện các thay đổi ở đây
+    localStorage.setItem('cart', JSON.stringify(cart))
+  }, [cart]) // Dùng useEffect chỉ khi cart thay đổi
+
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage)
+      localStorage.clear()
+      dispatch(messageClear())
+      navigate('/')
+    }
+
+    if (errorMessage) {
+      toast.error(errorMessage)
+      dispatch(messageClear())
+    }
+  }, [successMessage, errorMessage])
 
   const inputHandle = (e) => {
     setState({
@@ -35,32 +61,44 @@ const Shipping = () => {
     })
   }
 
-  useEffect(() => {
-    if (successMessage) {
-      toast.success(successMessage)
-      dispatch(messageClear())
-      navigate('/payment', {
-        state: {
-          price,
-          items,
-          orderId,
-        },
-      })
-    }
-  }, [orderId, successMessage])
-
-  const placeOrder = () => {
-    dispatch(
-      place_order({
-        price,
-        products,
-        shipping_fee,
-        items,
-        shippingInfo: state,
-        userId: userInfo.id,
-      })
+  const cartHTML = cart
+    .map(
+      (item) => `
+      <tr>
+        <td>${item.name}</td>
+        <td>${item.quantity}</td>
+        <td>${formatCurrency(item.price)}</td>
+        <td>${formatCurrency(item.price * item.quantity)}</td>
+      </tr>`
     )
-  }
+    .join('')
+
+  const emailContent = `
+  <div>
+    <h2>Thông tin đơn hàng</h2>
+    <p><b>Người đặt hàng:</b> ${state.name}</p>
+    <p><b>Địa chỉ:</b> ${state.address}, ${state.province}, ${state.city}, ${
+    state.area
+  }</p>
+    <p><b>Số điện thoại:</b> ${state.phone}</p>
+    <p><b>Mã bưu điện:</b> ${state.post}</p>
+    <h3>Chi tiết sản phẩm:</h3>
+    <table border="1" cellspacing="0" cellpadding="5">
+      <thead>
+        <tr>
+          <th>Tên sản phẩm</th>
+          <th>Số lượng</th>
+          <th>Đơn giá</th>
+          <th>Thành tiền</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${cartHTML}
+      </tbody>
+    </table>
+    <p><b>Tổng giá trị:</b> ${formatCurrency(parseInt(totalPrice))}</p>
+    </div>
+  `
 
   const save = (e) => {
     e.preventDefault()
@@ -70,6 +108,19 @@ const Shipping = () => {
     }
   }
 
+  const place_orders = () => {
+
+    // Dispatch action
+    dispatch(
+      place_order({
+        rcv: email,
+        subject: 'Đơn hàng mới từ website của bạn',
+        body: emailContent,
+      })
+    )
+
+  }
+
   return (
     <div>
       <Header />
@@ -77,13 +128,13 @@ const Shipping = () => {
         <div className="absolute left-0 top-0 w-full h-full bg-[#2422228a]">
           <div className="w-[85%] md:w-[80%] sm:w-[90%] lg:w-[90%] h-full mx-auto">
             <div className="flex flex-col justify-center gap-1 items-center h-full w-full text-white">
-              <h2 className="text-3xl font-bold">Shipping Page </h2>
+              <h2 className="text-3xl font-bold">Trang vận chuyển</h2>
               <div className="flex justify-center items-center gap-2 text-2xl w-full">
-                <Link to="/">Home</Link>
+                <Link to="/">Trang chủ</Link>
                 <span className="pt-1">
                   <IoIosArrowForward />
                 </span>
-                <span>Shipping </span>
+                <span>Vận chuyển </span>
               </div>
             </div>
           </div>
@@ -97,7 +148,7 @@ const Shipping = () => {
               <div className="flex flex-col gap-3">
                 <div className="bg-white p-6 shadow-sm rounded-md">
                   <h2 className="text-slate-600 font-bold pb-3">
-                    Shipping Information{' '}
+                    Thông tin người nhận
                   </h2>
 
                   {!res && (
@@ -105,7 +156,7 @@ const Shipping = () => {
                       <form onSubmit={save}>
                         <div className="flex md:flex-col md:gap-2 w-full gap-5 text-slate-600">
                           <div className="flex flex-col gap-1 mb-2 w-full">
-                            <label htmlFor="name"> Name </label>
+                            <label htmlFor="name"> Tên </label>
                             <input
                               onChange={inputHandle}
                               value={state.name}
@@ -114,11 +165,12 @@ const Shipping = () => {
                               name="name"
                               id="name"
                               placeholder="Name"
+                              required
                             />
                           </div>
 
                           <div className="flex flex-col gap-1 mb-2 w-full">
-                            <label htmlFor="address"> Address </label>
+                            <label htmlFor="address"> Địa chỉ </label>
                             <input
                               onChange={inputHandle}
                               value={state.address}
@@ -127,13 +179,14 @@ const Shipping = () => {
                               name="address"
                               id="address"
                               placeholder="Address"
+                              required
                             />
                           </div>
                         </div>
 
                         <div className="flex md:flex-col md:gap-2 w-full gap-5 text-slate-600">
                           <div className="flex flex-col gap-1 mb-2 w-full">
-                            <label htmlFor="phone"> Phone </label>
+                            <label htmlFor="phone"> Số điện thoại </label>
                             <input
                               onChange={inputHandle}
                               value={state.phone}
@@ -142,11 +195,12 @@ const Shipping = () => {
                               name="phone"
                               id="phone"
                               placeholder="Phone"
+                              required
                             />
                           </div>
 
                           <div className="flex flex-col gap-1 mb-2 w-full">
-                            <label htmlFor="post"> Post </label>
+                            <label htmlFor="post"> Mã bưu điện </label>
                             <input
                               onChange={inputHandle}
                               value={state.post}
@@ -155,13 +209,14 @@ const Shipping = () => {
                               name="post"
                               id="post"
                               placeholder="Post"
+                              required
                             />
                           </div>
                         </div>
 
                         <div className="flex md:flex-col md:gap-2 w-full gap-5 text-slate-600">
                           <div className="flex flex-col gap-1 mb-2 w-full">
-                            <label htmlFor="province"> Province </label>
+                            <label htmlFor="province"> Huyện </label>
                             <input
                               onChange={inputHandle}
                               value={state.province}
@@ -170,11 +225,12 @@ const Shipping = () => {
                               name="province"
                               id="province"
                               placeholder="Province"
+                              required
                             />
                           </div>
 
                           <div className="flex flex-col gap-1 mb-2 w-full">
-                            <label htmlFor="city"> City </label>
+                            <label htmlFor="city"> Thành phố/ Tỉnh </label>
                             <input
                               onChange={inputHandle}
                               value={state.city}
@@ -183,13 +239,14 @@ const Shipping = () => {
                               name="city"
                               id="city"
                               placeholder="City"
+                              required
                             />
                           </div>
                         </div>
 
                         <div className="flex md:flex-col md:gap-2 w-full gap-5 text-slate-600">
                           <div className="flex flex-col gap-1 mb-2 w-full">
-                            <label htmlFor="area"> Area </label>
+                            <label htmlFor="area"> Khu vực </label>
                             <input
                               onChange={inputHandle}
                               value={state.area}
@@ -198,12 +255,13 @@ const Shipping = () => {
                               name="area"
                               id="area"
                               placeholder="Area"
+                              required
                             />
                           </div>
 
                           <div className="flex flex-col gap-1 mt-7 mb-2 w-full">
                             <button className="px-3 py-[6px] rounded-sm hover:shadow-green-500/50 hover:shadow-lg bg-green-500 text-white">
-                              Save Change{' '}
+                              Lưu thay đổi
                             </button>
                           </div>
                         </div>
@@ -214,7 +272,7 @@ const Shipping = () => {
                   {res && (
                     <div className="flex flex-col gap-1">
                       <h2 className="text-slate-600 font-semibold pb-2">
-                        Deliver To {state.name}
+                        Giao hàng tới {state.name}
                       </h2>
                       <p>
                         <span className="bg-blue-200 text-blue-800 text-sm font-medium mr-2 px-2 py-1 rounded">
@@ -229,62 +287,37 @@ const Shipping = () => {
                           onClick={() => setRes(false)}
                           className="text-indigo-500 cursor-pointer"
                         >
-                          Change{' '}
+                          Thay đổi{' '}
                         </span>
                       </p>
 
                       <p className="text-slate-600 text-sm">
-                        Email To ariyan@gmail.com
+                        Email To: {email}
                       </p>
                     </div>
                   )}
                 </div>
 
-                {products.map((p, i) => (
-                  <div key={i} className="flex bg-white p-4 flex-col gap-2">
-                    <div className="flex justify-start items-center">
-                      <h2 className="text-md text-slate-600 font-bold">
-                        {p.shopName}
-                      </h2>
-                    </div>
-
-                    {p.products.map((pt, i) => (
-                      <div className="w-full flex flex-wrap">
-                        <div className="flex sm:w-full gap-2 w-7/12">
-                          <div className="flex gap-2 justify-start items-center">
-                            <img
-                              className="w-[80px] h-[80px]"
-                              src={pt.productInfo.images[0]}
-                              alt=""
-                            />
-                            <div className="pr-4 text-slate-600">
-                              <h2 className="text-md font-semibold">
-                                {pt.productInfo.name}
-                              </h2>
-                              <span className="text-sm">
-                                Brand: {pt.productInfo.brand}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex justify-between w-5/12 sm:w-full sm:mt-3">
-                          <h2 className="text-lg text-orange-500">
-                            $
-                            {pt.productInfo.price -
-                              Math.floor(
-                                (pt.productInfo.price *
-                                  pt.productInfo.discount) /
-                                  100
-                              )}
-                          </h2>
-                          <p className="line-through">
-                            ${pt.productInfo.price}
-                          </p>
-                          <p>-{pt.productInfo.discount}%</p>
+                {cart.map((pt, i) => (
+                  <div className="w-full flex flex-wrap">
+                    <div className="flex sm:w-full gap-2 w-7/12">
+                      <div className="flex gap-2 justify-start items-center">
+                        <img
+                          className="w-[80px] h-[80px]"
+                          src={`https://ahoang.onrender.com/api/ImageUpload/get/${pt.image}`}
+                          alt=""
+                        />
+                        <div className=" text-slate-600">
+                          <h2 className="text-md font-semibold">{pt.name}</h2>
                         </div>
                       </div>
-                    ))}
+                    </div>
+
+                    <div className="flex justify-center items-center w-5/12 sm:w-full sm:mt-3">
+                      <h2 className="text-lg text-orange-500">
+                        {formatCurrency(parseInt(pt.price))} x {pt.quantity}
+                      </h2>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -293,35 +326,35 @@ const Shipping = () => {
             <div className="w-[33%] md-lg:w-full">
               <div className="pl-3 md-lg:pl-0 md-lg:mt-5">
                 <div className="bg-white p-3 text-slate-600 flex flex-col gap-3">
-                  <h2 className="text-xl font-bold">Order Summary</h2>
+                  <h2 className="text-xl font-bold">Tóm tắt đặt hàng</h2>
                   <div className="flex justify-between items-center">
-                    <span>Items Total ({items}) </span>
-                    <span>{price}</span>
+                    <span>Tổng sản phẩm ({cart.length}) </span>
+                    <span>{formatCurrency(parseInt(totalPrice))}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span>Delivery Fee </span>
-                    <span>{shipping_fee}</span>
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <span>Total Payment </span>
-                    <span>{price + shipping_fee}</span>
+                    <span>Phí vận chuyển </span>
+                    <span>0</span>
                   </div>
 
+                  {/* <div className="flex justify-between items-center">
+                    <span>Tổng thanh toán </span>
+                    <span>{formatCurrency(parseInt(totalPrice))}</span>
+                  </div> */}
+
                   <div className="flex justify-between items-center">
-                    <span>Total</span>
+                    <span>Tổng</span>
                     <span className="text-lg text-[#059473]">
-                      {price + shipping_fee}
+                      {formatCurrency(parseInt(totalPrice))}
                     </span>
                   </div>
                   <button
-                    onClick={placeOrder}
+                    onClick={place_orders}
                     disabled={res ? false : true}
                     className={`px-5 py-[6px] rounded-sm hover:shadow-red-500/50 hover:shadow-lg ${
                       res ? 'bg-red-500' : 'bg-red-300'
                     }  text-sm text-white uppercase`}
                   >
-                    Place Order
+                    Đặt hàng
                   </button>
                 </div>
               </div>

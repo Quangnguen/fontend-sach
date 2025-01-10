@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import { Link } from 'react-router-dom'
@@ -6,31 +6,28 @@ import { IoIosArrowForward } from 'react-icons/io'
 import { Range } from 'react-range'
 import { AiFillStar } from 'react-icons/ai'
 import { CiStar } from 'react-icons/ci'
-import Products from '../components/products/Products'
 import { BsFillGridFill } from 'react-icons/bs'
 import { FaThList } from 'react-icons/fa'
 import ShopProducts from '../components/products/ShopProducts'
 import Pagination from '../components/Pagination'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  price_range_product,
-  query_products,
-} from '../store/reducers/homeReducer'
+import { query_products } from '../store/reducers/shopReducer'
+import categories from '../utils/categories'
 
 const Shops = () => {
   const dispatch = useDispatch()
   const {
     products,
-    categories,
-    price_range,
-    latest_product,
+    // price_range,
+    // latest_product,
     totalProduct,
     parPage,
-  } = useSelector((state) => state.home)
+  } = useSelector((state) => state.shop)
 
-  useEffect(() => {
-    dispatch(price_range_product())
-  }, [])
+  const price_range = useMemo(() => ({ low: 0, high: 300000 }), [])
+
+  console.log(products)
+
   useEffect(() => {
     setState({
       values: [price_range.low, price_range.high],
@@ -68,14 +65,7 @@ const Shops = () => {
         pageNumber,
       })
     )
-  }, [
-    state.values[0],
-    state.values[1],
-    category,
-    rating,
-    sortPrice,
-    pageNumber,
-  ])
+  }, [state.values, category, rating, sortPrice, pageNumber, dispatch])
 
   const resetRating = () => {
     setRating('')
@@ -131,7 +121,7 @@ const Shops = () => {
               } `}
             >
               <h2 className="text-3xl font-bold mb-3 text-slate-600">
-                Category{' '}
+                Category
               </h2>
               <div className="py-2">
                 {categories.map((c, i) => (
@@ -183,8 +173,8 @@ const Shops = () => {
                 />
                 <div>
                   <span className="text-slate-800 font-bold text-lg">
-                    ${Math.floor(state.values[0])} - $
-                    {Math.floor(state.values[1])}
+                    {Math.floor(state.values[0])} VND -
+                    {Math.floor(state.values[1])} VND
                   </span>
                 </div>
               </div>
@@ -322,9 +312,9 @@ const Shops = () => {
                 </div>
               </div>
 
-              <div className="py-5 flex flex-col gap-4 md:hidden">
+              {/* <div className="py-5 flex flex-col gap-4 md:hidden">
                 <Products title="Latest Product" products={latest_product} />
-              </div>
+              </div> */}
             </div>
 
             <div className="w-9/12 md-lg:w-8/12 md:w-full">
@@ -377,7 +367,7 @@ const Shops = () => {
                       setPageNumber={setPageNumber}
                       totalItem={totalProduct}
                       parPage={parPage}
-                      showItem={Math.floor(totalProduct / parPage)}
+                      showItem={4}
                     />
                   )}
                 </div>

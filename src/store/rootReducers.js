@@ -1,17 +1,18 @@
-import { authReducer } from './reducers/authReducer'
-import { cartReducer } from './reducers/cartReducer'
-import { chatReducer } from './reducers/chatReducer'
-import { dashboardReducer } from './reducers/dashboardReducer'
-import { homeReducer } from './reducers/homeReducer'
-import { orderReducer } from './reducers/orderReducer'
+// rootReducers.js
+import authReducer from './reducers/authReducer'
+import cartReducer from './reducers/cartReducer' // Không cần .reducer
+import dashboardReducer from './reducers/dashboardReducer'
+import homeReducer from './reducers/homeReducer'
+import orderReducer from './reducers/orderReducer'
+import shopReducer from './reducers/shopReducer'
 
 const rootReducer = {
-  home: homeReducer.reducer,
-  auth: authReducer.reducer,
-  cart: cartReducer.reducer,
-  order: orderReducer.reducer,
-  dashboard: dashboardReducer.reducer,
-  chat: chatReducer.reducer,
+  home: homeReducer,
+  auth: authReducer,
+  cart: cartReducer, // Đã export default reducer từ cartReducer.js
+  order: orderReducer,
+  dashboard: dashboardReducer,
+  shop: shopReducer,
 }
 
 export default rootReducer

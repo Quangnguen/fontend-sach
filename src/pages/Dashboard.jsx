@@ -12,7 +12,6 @@ import { RiLockPasswordLine } from 'react-icons/ri'
 import { useDispatch } from 'react-redux'
 import api from '../api/api'
 import { user_reset } from '../store/reducers/authReducer'
-import { reset_count } from '../store/reducers/cartReducer'
 
 
 const Dashboard = () => {
@@ -25,7 +24,6 @@ const Dashboard = () => {
     try {
         const {data} = await api.get('/auth/logout')
         localStorage.removeItem('customerToken')
-        dispatch(reset_count())
         dispatch(user_reset())
         navigate('/login')
     } catch (error) {

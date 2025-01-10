@@ -1,118 +1,98 @@
 import React, { useEffect } from 'react'
-import { FaEye, FaRegHeart } from 'react-icons/fa'
-import { RiShoppingCartLine } from 'react-icons/ri'
-import { Link, useNavigate } from 'react-router-dom'
-import Rating from '../Rating'
+import Carousel from 'react-multi-carousel'
+import { Link } from 'react-router-dom'
+import 'react-multi-carousel/lib/styles.css'
 import { useDispatch, useSelector } from 'react-redux'
-import { add_to_cart, add_to_wishlist } from '../../store/reducers/cartReducer'
-import toast from 'react-hot-toast'
-import { messageClear } from '../../store/reducers/authReducer'
+import { get_products_by_category } from '../../store/reducers/homeReducer'
+import apii from '../../api/apii'
+import { formatCurrency, truncateText } from '../../utils/format'
 
-const FeatureProducts = ({ products }) => {
-  const navigate = useNavigate()
+const FeatureProducts = ({ category }) => {
+  console.log(category)
+  const { productByCat } = useSelector((state) => state.home)
+  console.log(productByCat)
+
   const dispatch = useDispatch()
-  const { userInfo } = useSelector((state) => state.auth)
-  const { errorMessage, successMessage } = useSelector((state) => state.cart)
-
-  const add_card = (id) => {
-    if (userInfo) {
-      dispatch(
-        add_to_cart({
-          userId: userInfo.id,
-          quantity: 1,
-          productId: id,
-        })
-      )
-    } else {
-      navigate('/login')
-    }
-  }
-
-  const add_wishlist = (pro) => {
+  useEffect(() => {
     dispatch(
-      add_to_wishlist({
-        userId: userInfo.id,
-        productId: pro._id,
-        name: pro.name,
-        price: pro.price,
-        image: pro.images[0],
-        discount: pro.discount,
-        rating: pro.rating,
-        slug: pro.slug,
+      get_products_by_category({
+        category: category,
       })
     )
+  }, [category, dispatch])
+
+  const responsive = {
+    superLargeDesktop: {
+      breakpoint: { max: 4000, min: 3000 },
+      items: 5,
+    },
+    desktop: {
+      breakpoint: { max: 3000, min: 1024 },
+      items: 5,
+    },
+    tablet: {
+      breakpoint: { max: 1024, min: 464 },
+      items: 4,
+    },
+    mdtablet: {
+      breakpoint: { max: 991, min: 464 },
+      items: 4,
+    },
+    mobile: {
+      breakpoint: { max: 464, min: 0 },
+      items: 3,
+    },
+    smmobile: {
+      breakpoint: { max: 640, min: 0 },
+      items: 2,
+    },
+    xsmobile: {
+      breakpoint: { max: 440, min: 0 },
+      items: 1,
+    },
   }
 
-  useEffect(() => {
-    if (successMessage) {
-      toast.success(successMessage)
-      dispatch(messageClear())
-    }
-    if (errorMessage) {
-      toast.error(errorMessage)
-      dispatch(messageClear())
-    }
-  }, [successMessage, errorMessage])
-
   return (
-    <div className="w-[85%] flex flex-wrap mx-auto">
+    <div className="w-[87%] mx-auto relative">
       <div className="w-full">
         <div className="text-center flex justify-center items-center flex-col text-4xl text-slate-600 font-bold relative pb-[45px]">
-          <h2>Feature Products</h2>
+          <h2>{category}</h2>
           <div className=" w-[100px] h-[2px] bg-[#059473] mt-4"></div>
         </div>
       </div>
-
-      <div className="w-full grid grid-cols-4 md-lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-6">
-        {products.map((item, index) => (
-          <div
-            key={index}
-            className="border group transition-all duration-500 hover:shadow-md hover:-mt-3"
-          >
-            <div className="relative overflow-hidden">
-              <div className="flex justify-center items-center absolute text-white w-[38px] h-[38px] rounded-full bg-red-500 font-semibold text-xs left-2 top-2">
-                {item.discount}%
+      <Carousel
+        autoPlay={true}
+        infinite={true}
+        arrows={true}
+        responsive={responsive}
+        transitionDuration={500}
+      >
+        {productByCat.map((c, i) => (
+          <Link to={`/product/detail/${c.id}`} className="block px-1">
+            <div className="relative h-[270px]">
+              <div className="w-full h-full">
+                <img
+                  className="w-full h-full"
+                  src={`http://ahoang.runasp.net/api/ImageUpload/get/${c.imageFileName}`}
+                  alt=""
+                />
+                <div className="absolute h-full w-full top-0 left-0 opacity-25 hover:bg-slate-400 transition-all duration-500"></div>
               </div>
-              <img
-                className="sm:w-full w-full h-[240px]"
-                src={item.images[0]}
-                alt=""
-              />
-
-              <ul className="flex transition-all duration-700 -bottom-10 justify-center items-center gap-2 absolute w-full group-hover:bottom-3">
-                <li
-                  onClick={add_wishlist(item)}
-                  className="w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-[#059473] hover:text-white hover:rotate-[720deg] transition-all"
-                >
-                  <FaRegHeart />
-                </li>
-                <Link
-                  to={`/product/detail/${item.slug}`}
-                  className="w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-[#059473] hover:text-white hover:rotate-[720deg] transition-all"
-                >
-                  <FaEye />
-                </Link>
-                <li
-                  onClick={() => add_card(item._id)}
-                  className="w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-[#059473] hover:text-white hover:rotate-[720deg] transition-all"
-                >
-                  <RiShoppingCartLine />
-                </li>
-              </ul>
             </div>
 
-            <div className="py-3 text-slate-600 px-2">
-              <h2 className="font-bold">{item.name}</h2>
+            <div className="p-4 flex flex-col gap-1">
+              <h2 className="text-slate-600 text-lg font-bold">
+                {truncateText(c.name, 20)}
+              </h2>
               <div className="flex justify-start items-center gap-3">
-                <span className="text-md font-semibold">{item.price}</span>
-                <div className="flex">
-                  <Rating ratings={item.rating} />
-                </div>
+                <h2 className="text-lg font-bold text-slate-600">
+                  {formatCurrency(parseInt(c.price))}
+                </h2>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
-      </div>
+      </Carousel>
     </div>
   )
 }

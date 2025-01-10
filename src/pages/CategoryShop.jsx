@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import { Link, useSearchParams } from 'react-router-dom'
@@ -6,32 +6,25 @@ import { IoIosArrowForward } from 'react-icons/io'
 import { Range } from 'react-range'
 import { AiFillStar } from 'react-icons/ai'
 import { CiStar } from 'react-icons/ci'
-import Products from '../components/products/Products'
 import { BsFillGridFill } from 'react-icons/bs'
 import { FaThList } from 'react-icons/fa'
 import ShopProducts from '../components/products/ShopProducts'
 import Pagination from '../components/Pagination'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  price_range_product,
-  query_products,
-} from '../store/reducers/homeReducer'
+import { query_products } from '../store/reducers/shopReducer'
+import { encodeToURL } from '../utils/format'
 const CategoryShop = () => {
   let [searchParams, setSearchParams] = useSearchParams()
   const category = searchParams.get('category')
-  console.log(category)
+  const className = searchParams.get('class')
+  console.log(category, className)
   const dispatch = useDispatch()
-  const {
-    products,
-    categories,
-    price_range,
-    latest_product,
-    totalProduct,
-    parPage,
-  } = useSelector((state) => state.home)
-  useEffect(() => {
-    dispatch(price_range_product())
-  }, [])
+  const { products, totalProduct, parPage } = useSelector((state) => state.shop)
+
+  console.log(products)
+
+  const price_range = useMemo(() => ({ low: 0, high: 30000 }), [])
+
   useEffect(() => {
     setState({
       values: [price_range.low, price_range.high],
@@ -47,38 +40,34 @@ const CategoryShop = () => {
   const [pageNumber, setPageNumber] = useState(1)
   const [sortPrice, setSortPrice] = useState('')
 
-  useEffect(() => {
-    dispatch(
-      query_products({
-        low: state.values[0] || '',
-        high: state.values[1] || '',
-        category,
-        rating,
-        sortPrice,
-        pageNumber,
-      })
-    )
-  }, [
-    state.values[0],
-    state.values[1],
-    category,
-    rating,
-    sortPrice,
-    pageNumber,
-  ])
+  
+
   const resetRating = () => {
     setRating('')
     dispatch(
       query_products({
         low: state.values[0],
         high: state.values[1],
-        category,
-        rating: '',
+        category: encodeToURL(category),
+        className: encodeToURL(className),
         sortPrice,
         pageNumber,
       })
     )
   }
+
+  useEffect(() => {
+    dispatch(
+      query_products({
+        low: state.values[0] || '',
+        high: state.values[1] || '',
+        category,
+        className,
+        sortPrice,
+        pageNumber,
+      })
+    )
+  }, [dispatch, state.values, category, className, sortPrice, pageNumber])
 
   return (
     <div>
@@ -279,7 +268,7 @@ const CategoryShop = () => {
               </div>
 
               <div className="py-5 flex flex-col gap-4 md:hidden">
-                <Products title="Latest Product" products={latest_product} />
+                {/* <Products title="Latest Product" products={latest_product} /> */}
               </div>
             </div>
             <div className="w-9/12 md-lg:w-8/12 md:w-full">
@@ -330,7 +319,7 @@ const CategoryShop = () => {
                       setPageNumber={setPageNumber}
                       totalItem={totalProduct}
                       parPage={parPage}
-                      showItem={Math.floor(totalProduct / parPage)}
+                      showItem={Math.ceil(totalProduct / parPage)}
                     />
                   )}
                 </div>

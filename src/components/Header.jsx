@@ -12,15 +12,15 @@ import { FaCartShopping } from 'react-icons/fa6'
 import { FaPhoneAlt } from 'react-icons/fa'
 import { IoIosArrowDown } from 'react-icons/io'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  get_cart_products,
-  get_wishlist_products,
-} from '../store/reducers/cartReducer'
+// import {
+//   get_cart_products,
+// } from '../store/reducers/cartReducer'
+import categories from '../utils/categories'
 
 const Header = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { categories } = useSelector((state) => state.home)
+  // const { categories } = useSelector((state) => state.home)
   const { userInfo } = useSelector((state) => state.auth)
   const { cart_product_count, wishlist_count } = useSelector(
     (state) => state.cart
@@ -39,19 +39,16 @@ const Header = () => {
   }
 
   const redirect_cart_page = () => {
-    if (userInfo) {
-      navigate('/cart')
-    } else {
-      navigate('/login')
-    }
+    navigate('/cart')
   }
 
+  const cart = useSelector((state) => state.cart)
+
   useEffect(() => {
-    if (userInfo) {
-      dispatch(get_cart_products(userInfo.id))
-      dispatch(get_wishlist_products(userInfo.id))
-    }
-  }, [userInfo])
+    localStorage.setItem('cart', JSON.stringify(cart))
+  }, [cart])
+
+  
 
   return (
     <div className="w-full bg-white">
@@ -74,7 +71,7 @@ const Header = () => {
               </li>
             </ul>
 
-            <div>
+            {/* <div>
               <div className="flex justify-center items-center gap-10">
                 <div className="flex justify-center items-center gap-4 text-black">
                   <a href="#">
@@ -125,7 +122,7 @@ const Header = () => {
                   </Link>
                 )}
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
@@ -154,28 +151,28 @@ const Header = () => {
               <div className="flex justify-between md-lg:justify-center items-center flex-wrap pl-8">
                 <ul className="flex justify-start items-start gap-8 text-sm font-bold uppercase md-lg:hidden">
                   <li>
-                    <Link
+                    <Link to="/"
                       className={`p-2 block ${
                         pathname === '/' ? 'text-[#059473]' : 'text-slate-600'
                       } `}
                     >
-                      Home
+                      Trang chủ
                     </Link>
                   </li>
 
                   <li>
                     <Link
-                      to="/shops"
+                      to="/shop"
                       className={`p-2 block ${
                         pathname === '/shops'
                           ? 'text-[#059473]'
                           : 'text-slate-600'
                       } `}
                     >
-                      Shop
+                      Cửa hàng
                     </Link>
                   </li>
-                  <li>
+                  {/* <li>
                     <Link
                       className={`p-2 block ${
                         pathname === '/blog'
@@ -185,8 +182,8 @@ const Header = () => {
                     >
                       Blog
                     </Link>
-                  </li>
-                  <li>
+                  </li> */}
+                  {/* <li>
                     <Link
                       className={`p-2 block ${
                         pathname === '/about'
@@ -196,7 +193,7 @@ const Header = () => {
                     >
                       About Us
                     </Link>
-                  </li>
+                  </li> */}
                   <li>
                     <Link
                       className={`p-2 block ${
@@ -205,14 +202,14 @@ const Header = () => {
                           : 'text-slate-600'
                       } `}
                     >
-                      Contact Us
+                      Liên hệ
                     </Link>
                   </li>
                 </ul>
 
                 <div className="flex md-lg:hidden justify-center items-center gap-5">
                   <div className="flex justify-center gap-5">
-                    <div
+                    {/* <div
                       onClick={() =>
                         navigate(userInfo ? '/dashboard/my-wishlist' : '/login')
                       }
@@ -226,8 +223,8 @@ const Header = () => {
                         <div className="w-[20px] h-[20px] absolute bg-red-500 rounded-full text-white flex justify-center items-center -top-[3px] -right-[5px] ">
                           {wishlist_count}
                         </div>
-                      )}
-                    </div>
+                      )} */}
+                    {/* </div> */}
 
                     <div
                       onClick={redirect_cart_page}
@@ -239,7 +236,7 @@ const Header = () => {
 
                       {cart_product_count !== 0 && (
                         <div className="w-[20px] h-[20px] absolute bg-red-500 rounded-full text-white flex justify-center items-center -top-[3px] -right-[5px] ">
-                          {cart_product_count}
+                          {cart.length}
                         </div>
                       )}
                     </div>
@@ -307,6 +304,7 @@ const Header = () => {
             <ul className="flex flex-col justify-start items-start text-sm font-bold uppercase">
               <li>
                 <Link
+                  to="/"
                   className={`py-2 block ${
                     pathname === '/' ? 'text-[#059473]' : 'text-slate-600'
                   } `}
@@ -317,9 +315,9 @@ const Header = () => {
 
               <li>
                 <Link
-                  to="/shops"
+                  to="/shop"
                   className={`py-2 block ${
-                    pathname === '/shops' ? 'text-[#059473]' : 'text-slate-600'
+                    pathname === '/shop' ? 'text-[#059473]' : 'text-slate-600'
                   } `}
                 >
                   Shop
@@ -402,13 +400,13 @@ const Header = () => {
             <div className="bg-white relative">
               <div
                 onClick={() => setCategoryShow(!categoryShow)}
-                className="h-[50px] bg-[#059473] text-white flex justify-center md-lg:justify-between md-lg:px-6 items-center gap-3 font-bold text-md cursor-pointer"
+                className="h-[50px] bg-[#059473] text-white flex justify-between px-5 md-lg:justify-between md-lg:px-6 items-center gap-3 font-bold text-md cursor-pointer"
               >
                 <div className="flex justify-center items-center gap-3">
                   <span>
                     <FaList />
                   </span>
-                  <span>All Category </span>
+                  <span>Phân loại</span>
                 </div>
                 <span className="pt-1">
                   <IoIosArrowDown />
@@ -421,26 +419,39 @@ const Header = () => {
                 } overflow-hidden transition-all md-lg:relative duration-500 absolute z-[99999] bg-[#dbf3ed] w-full border-x`}
               >
                 <ul className="py-2 text-slate-600 font-medium">
-                  {categories.map((c, i) => {
-                    return (
-                      <li
-                        key={i}
-                        className="flex justify-start items-center gap-2 px-[24px] py-[6px]"
+                  {categories.map((c, i) => (
+                    <li
+                      key={i}
+                      // onClick={() => navigate(`/products?category=${c.name}`)}
+                      className="flex justify-start cursor-pointer hover:bg-slate-100 items-center gap-2 px-[24px] py-[12px] relative group"
+                    >
+                      <Link
+                        to={`/products?category=${c.name}`}
+                        className="text-sm block group-hover:text-primary w-full"
                       >
-                        <img
-                          src={c.image}
-                          className="w-[30px] h-[30px] rounded-full overflow-hidden"
-                          alt=""
-                        />
-                        <Link
-                          to={`/products?category=${c.name}`}
-                          className="text-sm block"
-                        >
-                          {c.name}
-                        </Link>
-                      </li>
-                    )
-                  })}
+                        {c.name}
+                      </Link>
+
+                      {/* Subcategories */}
+                      {c.subcategories && (
+                        <ul className="absolute left-3/4  top-0 hidden group-hover:block z-[99999] bg-white shadow-lg border rounded-lg w-[200px]">
+                          {c.subcategories.map((sub, subIndex) => (
+                            <li
+                              key={subIndex}
+                              className="px-[16px] py-[8px] hover:bg-slate-100"
+                            >
+                              <Link
+                                to={`/products?category=${c.name}&class=${sub.name}`}
+                                className="text-sm block text-slate-600"
+                              >
+                                {sub.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -457,7 +468,7 @@ const Header = () => {
                       name=""
                       id=""
                     >
-                      <option value="">Select Category</option>
+                      <option value="">Chọn phân loại</option>
                       {categories.map((c, i) => (
                         <option key={i} value={c.name}>
                           {' '}
@@ -478,7 +489,7 @@ const Header = () => {
                     onClick={search}
                     className="bg-[#059473] right-0 absolute px-8 h-full font-semibold uppercase text-white"
                   >
-                    Search
+                    Tìm kiếm
                   </button>
                 </div>
               </div>
@@ -494,7 +505,7 @@ const Header = () => {
                     <h2 className="text-md font-medium text-slate-700">
                       +1343-43233455
                     </h2>
-                    <span className="text-sm">Support 24/7</span>
+                    <span className="text-sm">Hỗ trợ 24/7</span>
                   </div>
                 </div>
               </div>

@@ -1,58 +1,30 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import api from '../../api/api'
+import apii from '../../api/apii'
 export const place_order = createAsyncThunk(
   'order/place_order',
-  async (
-    { price, products, shipping_fee, items, shippingInfo, userId },
-    { fulfillWithValue, rejectWithValue }
-  ) => {
+  async (query, { fulfillWithValue, rejectWithValue }) => {
     try {
-      const { data } = await api.post('/home/order/place-order', {
-        price,
-        products,
-        shipping_fee,
-        items,
-        shippingInfo,
-        userId,
+      const { data } = await apii.post(`/Email`, query.body, {
+        params: {
+          rcv: query.rcv,
+          subject: query.subject,
+        },
+        headers: {
+          'Content-Type': 'application/json',
+        },
       })
 
       return fulfillWithValue(data)
     } catch (error) {
-      return rejectWithValue(error.message)
-    }
-  }
-)
-// End Method
-export const get_orders = createAsyncThunk(
-  'order/get_orders',
-  async ({ customerId, status }, { rejectWithValue, fulfillWithValue }) => {
-    try {
-      const { data } = await api.get(
-        `/home/customer/get-orders/${customerId}/${status}`
+      console.error(
+        'Error placing order:',
+        error.response?.data || error.message
       )
-      // console.log(data)
-      return fulfillWithValue(data)
-    } catch (error) {
-      return rejectWithValue(error.response.data)
+      return rejectWithValue(error.response?.data || error.message)
     }
   }
 )
-// End Method
 
-export const get_order_details = createAsyncThunk(
-  'order/get_order_details',
-  async (orderId, { rejectWithValue, fulfillWithValue }) => {
-    try {
-      const { data } = await api.get(
-        `/home/customer/get-order-details/${orderId}`
-      )
-      // console.log(data)
-      return fulfillWithValue(data)
-    } catch (error) {
-      return rejectWithValue(error.response.data)
-    }
-  }
-)
 // End Method
 
 export const orderReducer = createSlice({
@@ -73,16 +45,11 @@ export const orderReducer = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(place_order.fulfilled, (state, { payload }) => {
-        state.successMessage = payload.data.message
-        state.orderId = payload.data.orderId
+        state.successMessage = "Đặt hàng thành công"
       })
 
-      .addCase(get_orders.fulfilled, (state, { payload }) => {
-        state.myOrders = payload.data.orders
-      })
-
-      .addCase(get_order_details.fulfilled, (state, { payload }) => {
-        state.myOrder = payload.data.order
+      .addCase(place_order.rejected, (state, { payload }) => {
+        state.errorMessage = payload.error
       })
   },
 })

@@ -13,9 +13,8 @@ import ShopProducts from '../components/products/ShopProducts'
 import Pagination from '../components/Pagination'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-  price_range_product,
   query_products,
-} from '../store/reducers/homeReducer'
+} from '../store/reducers/shopReducer'
 const SearchProducts = () => {
   let [searchParams, setSearchParams] = useSearchParams()
   const category = searchParams.get('category')
@@ -24,15 +23,12 @@ const SearchProducts = () => {
   const dispatch = useDispatch()
   const {
     products,
-    categorys,
     price_range,
     latest_product,
     totalProduct,
     parPage,
   } = useSelector((state) => state.home)
-  useEffect(() => {
-    dispatch(price_range_product())
-  }, [])
+  
   useEffect(() => {
     setState({
       values: [price_range.low, price_range.high],
