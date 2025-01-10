@@ -22,7 +22,7 @@ export const get_products_by_category = createAsyncThunk(
       )
       return fulfillWithValue(data)
     } catch (error) {
-      console.log(error.response)
+      console.log(error)
     }
   }
 )
@@ -40,9 +40,12 @@ export const homeReducer = createSlice({
   },
 
   extraReducers: (builder) => {
-    builder.addCase(get_products_by_category.fulfilled, (state, {payload}) => {
-      state.productByCat = payload.items
-    })
+    builder.addCase(
+      get_products_by_category.fulfilled,
+      (state, { payload }) => {
+        state.productByCat = payload.items
+      }
+    )
   },
 })
 

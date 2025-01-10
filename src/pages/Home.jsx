@@ -19,8 +19,8 @@ const Home = () => {
     <div className="w-full">
       <Header />
       <Banner />
-      {categories.map((category) => (
-        <div key={category.id} className='mb-10'>
+      {categories.map((category, i) => (
+        <div key={i} className='mb-10'>
           <FeatureProducts category={category.name} />
         </div>
       ))}
