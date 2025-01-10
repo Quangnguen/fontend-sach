@@ -16,6 +16,7 @@ import { product_details } from '../store/reducers/shopReducer'
 import toast from 'react-hot-toast'
 import { formatCurrency } from '../utils/format'
 import { addProduct } from '../store/reducers/cartReducer'
+import bannerImage from '../assets/images/banner/shop.png'
 
 const Details = () => {
   const { slug } = useParams()
@@ -125,7 +126,10 @@ const Details = () => {
   return (
     <div>
       <Header />
-      <section className='bg-[url("http://localhost:3000/images/banner/shop.png")] h-[220px] mt-6 bg-cover bg-no-repeat relative bg-left'>
+      <section
+        className="h-[220px] mt-6 bg-cover bg-no-repeat relative bg-left"
+        style={{ backgroundImage: `url(${bannerImage})` }} // Use the imported image
+      >
         <div className="absolute left-0 top-0 w-full h-full bg-[#2422228a]">
           <div className="w-[85%] md:w-[80%] sm:w-[90%] lg:w-[90%] h-full mx-auto">
             <div className="flex flex-col justify-center gap-1 items-center h-full w-full text-white">

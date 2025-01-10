@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import { Link, useSearchParams } from 'react-router-dom'
@@ -15,6 +15,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   query_products,
 } from '../store/reducers/shopReducer'
+import bannerImage from '../assets/images/banner/shop.png'
+
 const SearchProducts = () => {
   let [searchParams, setSearchParams] = useSearchParams()
   const category = searchParams.get('category')
@@ -23,11 +25,12 @@ const SearchProducts = () => {
   const dispatch = useDispatch()
   const {
     products,
-    price_range,
     latest_product,
     totalProduct,
     parPage,
-  } = useSelector((state) => state.home)
+  } = useSelector((state) => state.shop)
+
+  const price_range = useMemo(() => ({ low: 0, high: 300000 }), [])
   
   useEffect(() => {
     setState({
@@ -57,13 +60,13 @@ const SearchProducts = () => {
       })
     )
   }, [
-    state.values[0],
-    state.values[1],
+    state.values,
     category,
     rating,
     sortPrice,
     searchValue,
     pageNumber,
+    dispatch
   ])
   const resetRating = () => {
     setRating('')
@@ -82,17 +85,20 @@ const SearchProducts = () => {
   return (
     <div>
       <Header />
-      <section className='bg-[url("http://localhost:3000/images/banner/shop.png")] h-[220px] mt-6 bg-cover bg-no-repeat relative bg-left'>
+      <section
+        className="h-[220px] mt-6 bg-cover bg-no-repeat relative bg-left"
+        style={{ backgroundImage: `url(${bannerImage})` }} // Use the imported image
+      >
         <div className="absolute left-0 top-0 w-full h-full bg-[#2422228a]">
           <div className="w-[85%] md:w-[80%] sm:w-[90%] lg:w-[90%] h-full mx-auto">
             <div className="flex flex-col justify-center gap-1 items-center h-full w-full text-white">
-              <h2 className="text-3xl font-bold">Category Page </h2>
+              <h2 className="text-3xl font-bold">Trang sản phẩm</h2>
               <div className="flex justify-center items-center gap-2 text-2xl w-full">
-                <Link to="/">Home</Link>
+                <Link to="/">Trang chủ</Link>
                 <span className="pt-1">
                   <IoIosArrowForward />
                 </span>
-                <span>Category </span>
+                <span>Phân loại </span>
               </div>
             </div>
           </div>
@@ -105,7 +111,7 @@ const SearchProducts = () => {
               onClick={() => setFilter(!filter)}
               className="text-center w-full py-2 px-3 bg-indigo-500 text-white"
             >
-              Filter Product
+              Lọc sản phẩm
             </button>
           </div>
           <div className="w-full flex flex-wrap">
@@ -118,7 +124,7 @@ const SearchProducts = () => {
             >
               <div className="py-2 flex flex-col gap-5">
                 <h2 className="text-3xl font-bold mb-3 text-slate-600">
-                  Price
+                  Giá
                 </h2>
 
                 <Range
@@ -144,8 +150,8 @@ const SearchProducts = () => {
                 />
                 <div>
                   <span className="text-slate-800 font-bold text-lg">
-                    ${Math.floor(state.values[0])} - $
-                    {Math.floor(state.values[1])}
+                    {Math.floor(state.values[0])}VND - 
+                    {Math.floor(state.values[1])}VND
                   </span>
                 </div>
               </div>
@@ -295,9 +301,9 @@ const SearchProducts = () => {
                       name=""
                       id=""
                     >
-                      <option value="">Sort By</option>
-                      <option value="low-to-high">Low to High Price</option>
-                      <option value="high-to-low">High to Low Price </option>
+                      <option value="">Sắp xếp theo</option>
+                      <option value="low-to-high">Giá tăng dần</option>
+                      <option value="high-to-low">Giá giảm dần</option>
                     </select>
                     <div className="flex justify-center items-start gap-4 md-lg:hidden">
                       <div

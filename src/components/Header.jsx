@@ -49,6 +49,7 @@ const Header = () => {
   }, [cart])
 
   
+  
 
   return (
     <div className="w-full bg-white">
@@ -471,7 +472,6 @@ const Header = () => {
                       <option value="">Chọn phân loại</option>
                       {categories.map((c, i) => (
                         <option key={i} value={c.name}>
-                          {' '}
                           {c.name}{' '}
                         </option>
                       ))}
@@ -483,7 +483,7 @@ const Header = () => {
                     type="text"
                     name=""
                     id=""
-                    placeholder="What do you need"
+                    placeholder="Tìm kiến"
                   />
                   <button
                     onClick={search}
