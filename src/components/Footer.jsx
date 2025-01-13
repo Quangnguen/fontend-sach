@@ -1,19 +1,13 @@
 import React from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { FaFacebookF } from 'react-icons/fa'
-import { FaTwitter } from 'react-icons/fa6'
-import { FaLinkedin } from 'react-icons/fa'
-import { FaGithub } from 'react-icons/fa'
-import { useSelector } from 'react-redux'
-import { FaHeart } from 'react-icons/fa6'
-import { FaCartShopping } from 'react-icons/fa6'
+import { Link } from 'react-router-dom'
+// import { FaFacebookF } from 'react-icons/fa'
+// import { FaTwitter } from 'react-icons/fa6'
+// import { FaLinkedin } from 'react-icons/fa'
+// import { FaGithub } from 'react-icons/fa'
+import logo from '../assets/logo.png'
 
 const Footer = () => {
-  const navigate = useNavigate()
-  const { userInfo } = useSelector((state) => state.auth)
-  const { cart_product_count, wishlist_count } = useSelector(
-    (state) => state.cart
-  )
+ 
 
   return (
     <footer className="bg-[#f3f6fa]">
@@ -22,7 +16,7 @@ const Footer = () => {
           <div className="flex flex-col gap-3">
             <img
               className="w-[190px] h-[70px]"
-              src="http://localhost:3000/images/logo.png"
+              src={logo}
               alt="logo"
             />
             <ul className="flex flex-col gap-2 text-slate-600">
@@ -96,7 +90,7 @@ const Footer = () => {
                 Subscribe
               </button>
             </div>
-            <ul className="flex justify-start items-center gap-3">
+            {/* <ul className="flex justify-start items-center gap-3">
               <li>
                 <a
                   className="w-[38px] h-[38px] hover:bg-[#059473] hover:text-white flex justify-center items-center bg-white rounded-full"
@@ -130,7 +124,7 @@ const Footer = () => {
                   <FaGithub />{' '}
                 </a>
               </li>
-            </ul>
+            </ul> */}
           </div>
         </div>
       </div>
@@ -139,39 +133,7 @@ const Footer = () => {
         <span>Copiright @ 2024 All Rights Reserved </span>
       </div>
 
-      <div className="hidden fixed md-lg:block w-[50px] h-[110px] bottom-3 right-2 bg-white rounded-full p-2">
-        <div className="w-full h-full flex gap-3 flex-col justify-center items-center">
-          <div
-            onClick={() => navigate(userInfo ? '/cart' : '/login')}
-            className="relative flex justify-center items-center cursor-pointer w-[35px] h-[35px] rounded-full bg-[#e2e2e2]"
-          >
-            <span className="text-xl text-green-500">
-              <FaCartShopping />
-            </span>
-            {cart_product_count !== 0 && (
-              <div className="w-[20px] h-[20px] absolute bg-red-500 rounded-full text-white flex justify-center items-center -top-[3px] -right-[5px]">
-                {cart_product_count}
-              </div>
-            )}
-          </div>
-
-          <div
-            onClick={() =>
-              navigate(userInfo ? '/dashboard/my-wishlist' : '/login')
-            }
-            className="relative flex justify-center items-center cursor-pointer w-[35px] h-[35px] rounded-full bg-[#e2e2e2]"
-          >
-            <span className="text-xl text-green-500">
-              <FaHeart />
-            </span>
-            {wishlist_count !== 0 && (
-              <div className="w-[20px] h-[20px] absolute bg-red-500 rounded-full text-white flex justify-center items-center -top-[3px] -right-[5px]">
-                {wishlist_count}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+     
     </footer>
   )
 }

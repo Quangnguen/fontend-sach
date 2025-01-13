@@ -5,8 +5,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import { IoIosArrowForward } from 'react-icons/io'
 import { useDispatch, useSelector } from 'react-redux'
 import bannerImage from '../assets/images/banner/shop.png'
-
-import toast from 'react-hot-toast'
 import { formatCurrency } from '../utils/format'
 import { deleteProduct, updateQuantity } from '../store/reducers/cartReducer'
 
