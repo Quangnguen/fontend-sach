@@ -7,22 +7,17 @@ import { FaLinkedin } from 'react-icons/fa'
 import { FaGithub } from 'react-icons/fa'
 import { IoMdArrowDropdown } from 'react-icons/io'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { FaHeart } from 'react-icons/fa6'
 import { FaCartShopping } from 'react-icons/fa6'
 import { FaPhoneAlt } from 'react-icons/fa'
 import { IoIosArrowDown } from 'react-icons/io'
-import { useDispatch, useSelector } from 'react-redux'
-// import {
-//   get_cart_products,
-// } from '../store/reducers/cartReducer'
+import { useSelector } from 'react-redux'
+import logo from '../assets/logo.png'
+
 import categories from '../utils/categories'
 
 const Header = () => {
-  const dispatch = useDispatch()
   const navigate = useNavigate()
-  // const { categories } = useSelector((state) => state.home)
-  const { userInfo } = useSelector((state) => state.auth)
-  const { cart_product_count, wishlist_count } = useSelector(
+  const { cart_product_count } = useSelector(
     (state) => state.cart
   )
 
@@ -134,14 +129,13 @@ const Header = () => {
             <div className="md-lg:w-full w-3/12 md-lg:pt-4">
               <div className="flex justify-between items-center">
                 <Link to="/">
-                  <img src="http://localhost:3000/images/logo.png" alt="" />
+                  <img src={logo} alt="" />
                 </Link>
                 <div
                   className="justify-center items-center w-[30px] h-[30px] bg-white text-slate-600 border border-slate-600 rounded-sm cursor-pointer lg:hidden md-lg:flex xl:hidden hidden"
                   onClick={() => setShowShidebar(false)}
                 >
                   <span>
-                    {' '}
                     <FaList />{' '}
                   </span>
                 </div>
@@ -152,7 +146,8 @@ const Header = () => {
               <div className="flex justify-between md-lg:justify-center items-center flex-wrap pl-8">
                 <ul className="flex justify-start items-start gap-8 text-sm font-bold uppercase md-lg:hidden">
                   <li>
-                    <Link to="/"
+                    <Link
+                      to="/"
                       className={`p-2 block ${
                         pathname === '/' ? 'text-[#059473]' : 'text-slate-600'
                       } `}
@@ -165,7 +160,7 @@ const Header = () => {
                     <Link
                       to="/shop"
                       className={`p-2 block ${
-                        pathname === '/shops'
+                        pathname === '/shop'
                           ? 'text-[#059473]'
                           : 'text-slate-600'
                       } `}
@@ -264,43 +259,9 @@ const Header = () => {
         >
           <div className="flex justify-start flex-col gap-6">
             <Link to="/">
-              <img src="http://localhost:3000/images/logo.png" alt="" />
+              <img src={logo} alt="" />
             </Link>
-            <div className="flex justify-start items-center gap-10">
-              <div className="flex group cursor-pointer text-slate-800 text-sm justify-center items-center gap-1 relative after:h-[18px] after:w-[1px] after:bg-[#afafaf] after:-right-[16px] after:absolute ">
-                <img src="http://localhost:3000/images/language.png" alt="" />
-                <span>
-                  <IoMdArrowDropdown />
-                </span>
-                <ul className="absolute invisible transition-all top-12 rounded-sm duration-200 text-white p-2 w-[100px] flex flex-col gap-3 group-hover:visible group-hover:top-6 group-hover:bg-black z-10">
-                  <li>Hindi</li>
-                  <li>English</li>
-                </ul>
-              </div>
-              {userInfo ? (
-                <Link
-                  className="flex cursor-pointer justify-center items-center gap-2 text-sm text-black"
-                  to="/dashboard"
-                >
-                  <span>
-                    {' '}
-                    <FaUser />{' '}
-                  </span>
-                  <span>{userInfo.name}</span>
-                </Link>
-              ) : (
-                <Link
-                  className="flex cursor-pointer justify-center items-center gap-2 text-sm text-black"
-                  to="/login"
-                >
-                  <span>
-                    {' '}
-                    <FaLock />{' '}
-                  </span>
-                  <span>Login </span>
-                </Link>
-              )}
-            </div>
+            <div className="flex justify-start items-center gap-10"></div>
 
             <ul className="flex flex-col justify-start items-start text-sm font-bold uppercase">
               <li>
@@ -310,7 +271,7 @@ const Header = () => {
                     pathname === '/' ? 'text-[#059473]' : 'text-slate-600'
                   } `}
                 >
-                  Home
+                  Trang chủ
                 </Link>
               </li>
 
@@ -321,53 +282,10 @@ const Header = () => {
                     pathname === '/shop' ? 'text-[#059473]' : 'text-slate-600'
                   } `}
                 >
-                  Shop
-                </Link>
-              </li>
-              <li>
-                <Link
-                  className={`py-2 block ${
-                    pathname === '/blog' ? 'text-[#059473]' : 'text-slate-600'
-                  } `}
-                >
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link
-                  className={`py-2 block ${
-                    pathname === '/about' ? 'text-[#059473]' : 'text-slate-600'
-                  } `}
-                >
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link
-                  className={`py-2 block ${
-                    pathname === '/contact'
-                      ? 'text-[#059473]'
-                      : 'text-slate-600'
-                  } `}
-                >
-                  Contact Us
+                  Cửa hàng
                 </Link>
               </li>
             </ul>
-            <div className="flex justify-start items-center gap-4 text-black">
-              <a href="#">
-                <FaFacebookF />
-              </a>
-              <a href="#">
-                <FaTwitter />{' '}
-              </a>
-              <a href="#">
-                <FaLinkedin />
-              </a>
-              <a href="#">
-                <FaGithub />{' '}
-              </a>
-            </div>
 
             <div className="w-full flex justify-end md-lg:justify-start gap-3 items-center">
               <div className="w-[48px] h-[48px] rounded-full flex bg-[#f5f5f5] justify-center items-center ">
@@ -379,7 +297,7 @@ const Header = () => {
                 <h2 className="text-sm font-medium text-slate-700">
                   +134343455
                 </h2>
-                <span className="text-xs">Support 24/7</span>
+                <span className="text-xs">Hỗ trợ 24/7</span>
               </div>
             </div>
 
@@ -416,18 +334,19 @@ const Header = () => {
 
               <div
                 className={`${
-                  categoryShow ? 'h-0' : 'h-[400px]'
-                } overflow-hidden transition-all md-lg:relative duration-500 absolute z-[99999] bg-[#dbf3ed] w-full border-x`}
+                  categoryShow ? 'h-0 hidden' : 'h-[400px]'
+                } transition-all md-lg:relative duration-500 absolute z-[99999] bg-[#dbf3ed] w-full border-x`}
               >
                 <ul className="py-2 text-slate-600 font-medium">
                   {categories.map((c, i) => (
                     <li
                       key={i}
-                      // onClick={() => navigate(`/products?category=${c.name}`)}
                       className="flex justify-start cursor-pointer hover:bg-slate-100 items-center gap-2 px-[24px] py-[12px] relative group"
                     >
                       <Link
-                        to={`/products?category=${c.name}`}
+                        to={
+                          c.category ? `/products?category=${c.category}` : ''
+                        }
                         className="text-sm block group-hover:text-primary w-full"
                       >
                         {c.name}
@@ -435,14 +354,20 @@ const Header = () => {
 
                       {/* Subcategories */}
                       {c.subcategories && (
-                        <ul className="absolute left-3/4  top-0 hidden group-hover:block z-[99999] bg-white shadow-lg border rounded-lg w-[200px]">
+                        <ul className="absolute left-full top-0 hidden group-hover:flex z-[99999] bg-white shadow-lg border rounded-lg w-[300px] flex-col overflow-hidden">
                           {c.subcategories.map((sub, subIndex) => (
                             <li
                               key={subIndex}
                               className="px-[16px] py-[8px] hover:bg-slate-100"
                             >
                               <Link
-                                to={`/products?category=${c.name}&class=${sub.name}`}
+                                to={
+                                  c.category && sub.class
+                                    ? `/products?category=${c.category}&class=${sub.name}`
+                                    : sub.category
+                                    ? `/products?category=${sub.category}`
+                                    : ''
+                                }
                                 className="text-sm block text-slate-600"
                               >
                                 {sub.name}
