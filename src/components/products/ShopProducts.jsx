@@ -1,14 +1,12 @@
 import React, { useEffect } from 'react'
-import { FaEye, FaRegHeart } from 'react-icons/fa'
+import { FaEye } from 'react-icons/fa'
 import { RiShoppingCartLine } from 'react-icons/ri'
-import Rating from '../Rating'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { addProduct } from '../../store/reducers/cartReducer'
 import { formatCurrency } from './../../utils/format'
 
 const ShopProducts = ({ styles, products }) => {
-  const navigate = useNavigate()
   const dispatch = useDispatch()
 
   const cart = useSelector((state) => state.cart)
